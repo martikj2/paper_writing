@@ -1,0 +1,586 @@
+\documentclass{iopart}
+%\documentclass[pra,superscriptaddress,twocolumn,notitlepage,showpacs]{revtex4-1}
+
+%\documentclass[aps,superscriptaddress,twocolumn,notitlepage,showpacs]{revtex4-1}
+%\documentclass[aps,superscriptaddress,twocolumn]{nature}
+\usepackage{graphicx} 
+\usepackage{bm}% bold math2
+%\usepackage{amsmath}
+ 
+ 
+\usepackage{lipsum} % dummy text for the MWE
+% Put % before of what you want disabled1
+% Select what to do with todonotes: 
+%\usepackage[disable]{todonotes} % notes not showed
+\usepackage[draft]{todonotes}   % notes showed
+% Select what to do with command \comment:  
+
+ 
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\enq}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\ena}{\end{eqnarray}}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+
+\newcommand{\brho}{\bm{\rho}}
+%\newcommand{\br}{\bm{r}}
+\newcommand{\be}{\bm{e}}
+\newcommand{\bn}{\bm{n}}
+\newcommand{\bd}{\bm{d}}
+\newcommand{\bbf}{\bm{f}}
+\newcommand{\bx}{\bm{x}}
+\newcommand{\by}{\bm{y}}
+\newcommand{\bz}{\bm{z}}
+\newcommand{\bk}{\bm{k}}
+\newcommand{\bq}{\bm{q}}
+\newcommand{\bp}{\bm{p}}
+\newcommand{\bj}{\bm{j}}
+\newcommand{\bu}{\bm{u}}
+\newcommand{\bv}{\bm{v}}
+\newcommand{\ba}{\bm{a}}
+\newcommand{\bb}{\bm{b}}
+\newcommand{\bh}{\bm{h}}
+\newcommand{\bP}{\bm{P}}
+
+\begin{document}
+\title{Modelling lasing in plasmonic nano-particle arrays}
+\author{J.-P. Martikainen$^1$, H. T. Rekola$^1$, T. K. Hakala$^1$ and P. T\"{o}rm\"{a}$^1$}
+%\affiliation{COMP Centre of Excellence, Department of Applied Physics,
+%Aalto University, P.O. Box 15100, Fi-00076 Aalto, Finland}
+\address{$^1$ COMP Centre of Excellence, Department of Applied Physics,Aalto University, P.O. Box 15100, Fi-00076 Aalto, Finland}
+
+
+\date{\today}
+
+\begin{abstract}
+We study lasing in 
+arrays of metallic nanoparticles combined with active medium of dye molecules. We use a model which reduces the generally complicated spatial
+and temporal dynamics of electromagnetic fields in the array structure
+to a single ordinary differential equation for an oscillating dipole.
+This approximation reduces the computational effort drastically and by
+benchmarking our model against recent experiments we find satisfactory
+agreement with experiments.
+\end{abstract}
+%\keywords{plasmonics,lasing}
+\pacs{33.80.-b, 73.20.Mf,05.30.-d}
+\maketitle 
+
+%\ioptwocol
+
+\section{Introduction}
+
+\begin{itemize}
+\item History of plasmon lasing?:
+\item Why interesting:
+\item Status of the experiments: 
+\item Fast modulation speeds Refs 7-9 Odom
+\item sub-wavelength mode confinement Refs 7-9 Odom
+\item large losses poor directionality..tradeoff
+\item Omat paperit ~\cite{martikainen_condensation_2014,shi_spatial_2014,vakevainen_plasmonic_2014}
+\end{itemize}
+
+Nanoscale light sources based on plasmons on metallic nano-particles
+are of interest due to sub-wavelength modeconfinement as well as potentially fast modulation speeds. Basic tools of optics include amplifiers and lasers and such  devices would be needed in nano-optics as well.
+A concept of a spaser i.e. surface plasmon amplification by stimulated emission of radiation was proposed by Bergman and Stockman~\cite{bergman_surface_2003}.
+In a spaser electric fields due to surface plasmons close to a nano-particle
+become amplified by stimulated emission due to inversion in the gain medium
+surrounding the particle. Such prosesses have been experimentally 
+observed~\cite{noginov_demonstration_2009,oulton_plasmon_2009}.
+
+If there is an array of metallic nano-particles the collective response in the whole array can be quite different from that of individual nano-particles. In particular,
+the array can support so-called surface lattice resonances (SLRs) which can be 
+observed as very narrow extinction lineshapes. Such modes can furthermore
+coherently and strongly couple to molecules surrounding the nano-particle array~\cite{vakevainen_plasmonic_2014,shi_spatial_2014}.
+If gain medium feeds energy into de-localized SLR modes, it is possible that
+for sufficiently inverted gain medium, gain can exceed the high loss rate
+of a plasmonic system. This can take place easier for the SLR modes than for 
+individual surface plasmons since the losses in a SLR mode can be weaker.
+This was indeed observed in a recent experiment by Zhou {\it et al.}~\cite{zhou_lasing_2013}.
+
+
+Our goal here is to present and benchmark a simple, but nevertheless
+quite accurate way to model lasing in plasmonic nano-particle arrays.
+Our method builds on neo-classical lasing theory, but takes the lasing
+mode from the dipole fields of the metallic nano-particles. In the limit we consider, the complicated spatially dependent field dynamics can be replaced
+by a single ordinary differential equation for a dipole.
+This reduces the computational effort drastically from, for example, FDTD
+simulations and enables rapid scans over broad range of parameters.
+With benchmark our model against experimental results and find good agreement by adjusting only one uncertain parameter.
+
+
+\section{Methods}
+Previously plasmonic lasing has been approached using time dependent finite difference (FDTD)
+methods for electromagnetic fields in conjunction with $4$-level description of dye molecules
+forming the active material~\cite{dridi_model_2013}. Our approach shares some of the physical insights of
+such models, but aims to lighter computational requirements and hence to a possibility
+of scanning broad parameter ranges rapidly. We treat the gain material as a $4$-level system, but
+in order to account for quantum yields that substantially below unity, we 
+add an extra decay channel from the upper lasing level to the ground state. Furthermore, we simplify the
+description of the electromagnetic field so that it is described by only a single ordinary differential equation
+for the nano-particle dipole. In the next subsections we explain this in detail.
+
+
+\subsection{Modelling nano-particle array and electric fields}
+We show a schematic description of our system in Fig.~\ref{fig:schematic}.  We consider a square array
+of golden ellipsoidal nano-particles bedded in a dye containing material
+which constitutes the active medium of the lasing process. Dye molecules are
+pumped with a laser pulse which is off-resonant with the SLR modes in the array. We will first explain how to describe the SLR modes and related
+electric fields in the array.
+
+\begin{figure} %[H]
+\includegraphics[width=0.9\columnwidth]{schematic_modify.png}
+\caption[Fig1]{Schematic description of the system we consider. There is a square array of
+ellipsoidal (golden) nano-particles that are imbedded in a material containing dye molecules. Fields due to each nano-particle are
+described by identical in-phase dipoles which are indicated in the figure by the blue arrows.
+%The polarization of the pump laser is indicated with the arrow and is along the symmetry axis of the array.
+}
+\label{fig:schematic}
+\end{figure} 
+
+Oscillating electric field induces oscillating charge density in a metallic nano-particle. Often it is a good approximation to to describe induced fields
+only in terms of an electric dipole. A coupled dipole approximation 
+assumes that dipole in each nano-particle originates from the incoming driving field ${\bf E}_{in}({\bf r})$ and the dipole fields of all the other dipoles in the nano-particle array. Since these dipole fields depend on the electric dipoles
+of other nano-particles, one must solve for a self-consistent solution
+which transforms the problem into a solution of a set of linear equations.
+
+If an electric field oscillating at angular frequency $\omega$ induces a dipole, polarizability $\alpha(\omega)$ is proportionality
+constant between the field and the dipole  i.e. ${\bf p}=\bar{\alpha}(\omega) {\bf E}$.
+Generally polarizability is a tensor since induced dipole does not have to be along the
+inducing field and furthermore, material properties might be such that response is different
+for fields in different directions. Our aim here is not to explore such properties and we will consistently assume that pump laser electric field is polarized along the array symmetry axis and that nano-particle ellipsoids
+have a same main axis along $x$ and $y$-axis. For this reason it is enough
+to treat $\alpha(\omega)$ as a scalar here.
+
+In our modelling we assume that nano-particles are metallic ellipsoids
+with main axis $a$, $b$, and $c$ along the $x$-, $y$-, and $z$-axis.
+The material in nano-particles has permittivity $\epsilon_h$ while
+the medium around nano-particles has $\epsilon_m$. 
+Then the static polarizability~\cite{meier_enhanced_1983} of a single nano-particle is
+\beq
+\alpha_{stat}(\omega)=\frac{abc}{3}\frac{\epsilon_h-\epsilon_m}{N_x(\epsilon_h-\epsilon_m)+\epsilon_m}
+\label{eq:astat}
+\enq
+Here $N_x$ is the depolarization factor along $x$-direction
+\beq
+N_x=\frac{abc}{2}\int_0^\infty \frac{dq}{(q+a^2)\sqrt{(a+q^2)(b+q^2)(c+q^2)}}.
+\enq
+(For ellipsoids static polarizability is in general different in different directions since main axes can be different. In our case $x$- and $y$-directions are the relevant once and we assume ellipsoids with $a=b$.)
+In our computations we consistently assume gold nano-particles
+and use tabulated values for the permittivities~\cite{johnson_optical_1972}.
+The dielectric medium around the nano-particles is taken to have an index of refraction 
+$n=1.52$ so that its permittivity is $\epsilon_m=\epsilon_0 n^2$.
+
+To improve accuracy the expression~\ref{eq:astat} for the quasi-static polarizability should still be corrected by finite wavelength effects~\cite{meier_enhanced_1983}. This is
+known as the modified long wavelength approaximation and the final single
+particle polarizability we use is given by
+\beq
+\alpha_{MLWA}(\omega)=\frac{\alpha_{stat}(\omega)}{1-\frac{2i}{3}k^3\alpha_{stat}-\frac{k^2}{a}\alpha_{stat}},
+\enq
+where $k$ is the wavenumber in the medium. The term proportional to
+$k^3$ is a correction due to radiation damping while the term proportional to
+$k^2$ is due to dynamical depolarization~\cite{kelly_optical_2003}.
+
+The previous discussion provides the basis of understanding 
+the dipole response of a single ellipsoidal nano-particle. This
+knowledge can now be used to gain understanding also of the response in 
+nano-particle arrays.
+The basic idea of the coupled dipole approximation (CDA) 
+in an array of nano-particles is to assume that the field inducing a dipole in one of the nano-particles
+in an array doesn't only arise from the incoming pump field but also
+from the dipole fields of all the other
+nano-particles in the array.~\cite{purcell_scattering_1973,zhao_extinction_2003,yurkin_discrete_2007}
+CDA often provides an accurate description of many properties of
+plasmonic arrays {\bf CITE SOMEBODY}~\cite{vakevainen_plasmonic_2014}. 
+
+The electric field due to the oscillating dipoles ${\bf p}_j$ 
+is given by
+\begin{eqnarray}
+&&{\bf E}_{DD}({\bf r})=\sum_{j} {\bf E}_{D,j}({\bf r})
+= \\
+&&\sum_{j} \frac{e^{i k R}}{4 \pi \epsilon_0} \left\{ 
+k^2 \frac{\left( {\bf e}_r \times {\bf p}_j \right) \times {\bf e}_r }{R} + 
+\bigl[ 
+ 3 {\bf e}_r \left( {\bf e}_r \cdot {\bf p}_j\right) - {\bf p}_j
+\bigr] \left( \frac{1}{R^3} -\frac{i k}{R^2}\right)
+\right\},\nonumber \label{DipoleFieldsA} 
+\end{eqnarray}
+where $\omega$ is the oscillation frequency, $j$ indicates the nano-particle at position ${\bf r}_j$, $\bm{e}_r=\bm{(r-r_j)}/R$,
+and $R=|{\bf r}-{\bf r}_j|$.
+Then the problem is to find all the dipoles ${\bf p}_i$ by solving the set of
+linear equations
+\beq
+{\bf p}_i=\alpha(\omega)\left[{\bf E}_{in}({\bf r}_i)+{\bf E}_{DD}({\bf r}_i)\right].
+\enq
+
+In an infinite array with an incoming field normal to the nano-particle array we can take all dipoles to have a same magnitude
+in which case the problem simplifies considerably. The effects of the array
+structure can be summed into a term
+\beq
+S=\sum_{j\neq i}\frac{(1-ikr_{ij})(3\cos^2\theta_{ij}-1)e^{ikr_{ij}}}{r_{ij}^3}
++\frac{k^2\sin^2\theta_{ij}e^{ikr_{ij}}}{r_{ij}}
+\enq
+where we could choose $i$ to be, for example, the dipole in the center
+of the array. $\theta_{ij}$ is the angle between the polarization of the 
+incoming electric field and the vector
+${\bf r}_{ij}={\bf r}_j-{\bf r}_i$ between two nano-particles. In terms
+of $S$ the effective response of the whole array structure can be modelled
+by the polarizability
+\beq
+\alpha_{eff}(\omega)=\frac{\alpha_{MLWA}(\omega)}{1-S\alpha_{MLWA}(\omega)}.
+\enq
+In SI units $\alpha_{eff}(\omega)$ should still be multiplied by $4\pi\epsilon_m$, where $\epsilon_m$ is the permittivity of the medium around
+nano-particles.
+
+In Fig.~\ref{fig:arraypolarizability} we show an example of the absolute value of the effective polarizability
+in a square array with lattice spacing of $600\, nm$. This is the array structure we assume throughout this article.
+ The broad peak at higher energies (lower wavelengths)
+is due to SPP in single nano-particle while the narrow lower energy peak (at the $\Gamma$-point) is due to 
+the surface lattice resonance. We expect lasing transition to occur at the frequency 
+coresponding to this peak since there coupling between fields and nano-particles is strongest.
+\begin{figure} %[H]
+\includegraphics[width=0.9\columnwidth]{Polarizability_CDA.eps}
+\caption[Fig3]{Effective polarizability for the square array of golden ellipsoidal nano-particles
+as a function of wavelength.
+ The main axis of the ellipsoids were $a=b=65\, nm$ and $c=37.5\, nm$ so that the volume of the particle is the same as the volume of the cylinders in~\cite{zhou_lasing_2013} and the lattice constant of the square array was $d=600\, nm$. For permittivities we used values from ref.~\cite{johnson_optical_1972}
+}
+\label{fig:arraypolarizability}
+\end{figure} 
+
+
+Since many properties the system response (such as extinction coefficient)
+is well predicted by the CDA,
+we might be able to describe also lasing reasonably well by taking the electric field
+due to in-phase dipoles (as in the experiment by Zhou {\it et al.}~\cite{zhou_lasing_2013}) as the lasing field. In the limit where all nano-particles
+are described by a same dipole, we can then describe the spatially dependent
+electric field of the lasing mode with a single ordinary differential equation
+for the dipole.
+
+Note that in CDA one looks for a response to an infinitely long oscillating driving field.
+In pulsed system this is an approximation since it reality, for example, retardation effects
+will imply a delay before the CDA response is realized.
+We model the dynamics of the dipole giving rise to the SLR mode with a damped harmonic oscillator model. Then the equation for the SLR mode dipole oscillating around the lasing transition frequency is given by
+\beq
+\frac{d^2p(t)}{dt^2}+\gamma_{SLR}\frac{dp(t)}{dt}+\omega_{SLR}^2p(t)=
+\alpha(\omega)E_{in}(t)+
+\frac{1}{\epsilon_m D_d}\frac{d^2P_{43}}{dt^2}.
+\label{eq:dipoleeq}
+\enq
+Here $\alpha(\omega)$ is related to CDA effective polarizability via
+\beq
+\alpha(\omega)=\alpha_{eff}(\omega)\left[(\omega_{SLR}^2-\omega^2)-i\omega\gamma_{SLR}\right].
+\enq
+This choice ensures that for infinitely long driving field (with no active medium)
+$E_{0}\exp(-i\omega t)$ the response approaches 
+$p=\alpha_{CDA}(\omega)E_{0}$. $\gamma_{np}$ describes losses
+of the SLR mode and from the width of the response peak
+we estimate this as $\gamma_{SLR}=10\, meV$.
+$\omega_{SLR}$ is the SLR mode frequency which in turn is the energy
+difference between upper and lower lasing levels in the active medium.
+
+The dipole is driven by the polarization density $P_{43}(t)$ of the 
+lasing transition. From now on we make the assumption that nano-particle dipoles are only driven by the active medium
+and not by the input laser pulse which only excited molecules in the active medium. In this case $\alpha(\omega)E_{in}(t)$ term on the right hand side
+of Eq.~(\ref{eq:dipoleeq}) can be ignored.
+This is reasonable if plasmonic modes are off-resonant with the pump
+frequency or if they decay so quickly as to have only small impact on the dynamics. (In Eq.~(\ref{eq:dipoleeq})
+$D_d$ which appears in the denominator is a proportionality constant
+between dipole magnitude and the electric field due to dipoles in the array structure. Read more on this in the next subsection.)
+
+
+
+\subsection{Lasing model}
+In our system there is (possibly) a strong pump laser exciting
+dye molecules. Pumped molecules decay quickly among the excited states
+into a long lived state that is the excited state of the lasing transition.
+Due to its long life time strong inversion density can develop
+between this state and the (quickly decaying) excited state close to the ground state. In these
+conditions stimulated emission processes can become important as a strong lasing field develops in the nano-particle array. These basic principles
+suggest a minimal $4$-level description of the active media along the
+neo-classical lasing theory~\cite{anthony_e._siegman_lasers_1986}.
+In the following we do not assume weak coupling between emitters and the fields
+so we have, for example, the possibility of Rabi oscillations
+included in the formalism.
+For the active media we have then following set of equations. 
+In Fig.~\ref{fig:4level_schematic} we show a schematic description
+of the dye molecules of the active medium.
+\begin{figure} %[H]
+\includegraphics[width=0.9\columnwidth]{4level_schematic.pdf}
+\caption[Fig3]{$4$-level description of the dye molecules together with the notation
+we use. Lasing transition is indicated by the thick blue arrow and the pump with the black arrow. In these transition there can be a strong
+electric field present and stimulated emission can be important.
+Spontaneous emission processes are indicated by dashed arrows. We have also
+added (green arrow) a separate decay channel away from the
+upper lasing level to the ground state to capture some of the effects from
+non-unit quantum yield. If quantum yield $\eta$ is one, this transition has infinite lifetime and otherwise $\tau_{13}=\tau_{23} \eta/(1-\eta)$. In our 
+examples we choose $\eta=0.16$.
+}
+\label{fig:4level_schematic}
+\end{figure} 
+
+
+There are equations for polarization densities for transition $1-4$ pumped by the laser
+and for the lasing transition $2-3$:
+\beq
+\frac{d^2P_{14}(t)}{dt^2}+\Delta\omega_{14}\frac{dP_{14}(t)}{dt}+\omega^2P_{14}(t)=
+\frac{3\omega_{14}\epsilon_m\lambda_{14}^3\gamma_{rad,14}}{4\pi^2}\Delta N_{14} E_{in}(t),
+\enq
+\beq
+\frac{d^2P_{23}(t)}{dt^2}+\Delta\omega_{23}\frac{dP_{23}(t)}{dt}+\omega_a^2P_{23}(t)=
+\frac{3\omega_{23}\epsilon_m\lambda_{23}^3\gamma_{rad,23}}{4\pi^2}\Delta N_{23} E_{DD}(t)
+\enq
+where $E_{DD}(t)$ describes the field due to oscillating dipoles in the nano-particle array at frequency $\omega_{23}=\omega_3-\omega_2$. 
+While $E_{in}(t)$ is the electric field of the pump pulse. We take the pump pulse to be a gaussian pulse
+\beq
+E_{in}(t)=E_0\sin(\omega_{14}t)e^{-\frac{(t-3\tau)^2}{\tau^2}},
+\enq
+where $\tau$ is the pulse length and $E_0$ is related to the areal energy
+density $\cal{E}$ of the pump pulse through
+\beq
+E_0=\sqrt{\frac{2{\cal E}\sqrt{2/\pi}}{\epsilon_0 c_0 n\tau}}
+\enq
+with $\epsilon_0$ permittivity of the vacuum and $c_0$ the vacuum speed of light.
+
+$\Delta N_{14}=N_4-N_1$ and  $\Delta N_{23}=N_3-N_2$ are inversion densities for the transitions. $\lambda_{23}$ and $\lambda_{14}$ are transition
+wavelengths while $\gamma_{rad,14}$ and $\gamma_{rad,23}$ are the radiative
+lifetimes for the transitions. Decay coefficients
+$\Delta\omega_{23}$ and $\Delta\omega_{14}$ are larger radiative decay rates
+since they include also dephasing processes due to, for example, collisions.
+%The decay coefficients $\gamma_{rad,14}$
+%and $\gamma_{rad,23}$ are larger than for single molecules since they
+%also contain effects due collisional broadening in the gain material.
+
+
+Finally the ``cavity'' electric field is taken to be the field originating from all dipoles oscillating in-phase in the nano-particles. In principle,
+this field has a pronounced position dependence, but for simplicity we
+average this field in the array to get a characteristic field strength
+and the proportionality constant between this field and the nano-particle dipole. More specifically we use
+\beq
+{\bf E}_{DD}(t)=D_d p(t)\exp(-i\omega_{23} t),
+\enq
+where the proportionality constant 
+\beq
+D_d=\sqrt{\langle |{\bf E}_{DD}({\bf r})|^2\rangle }/p_0.
+\label{eq:DDaverage}
+\enq
+${\bf E}_{DD}({\bf r})$ is the combined field of the in-phase dipoles and
+${\bf p}_0=\alpha_{eff}(\omega_{23}){\bf E}_{in}$. (Strength of the input field
+${\bf E}_{in}$ in this formula is irrelevant since it cancels
+away when computing the proportionality
+constant $D_d$.) The average is taken over all locations in the structure except points inside the nano-particles.
+
+In Fig.~\ref{fig:DDaveraging} we demonstrate that the proportionality factor
+between the field and the dipole is in fact dominated by the fields close to
+the nano-particles. More than half of its value originates from the average that only includes
+the volume within $50\, nm$ of the nano-particles. 
+It should be noticed that our averaging procedure takes
+to some extent into account the enhancement of the 
+stimulated emission rate (which is proportional to intensity)
+close to the dipoles. On the other hand decay enhancement 
+due to Purcell effect is a separate phenomena. Purcell factor 
+can be measured independently by time resolved measurement
+of molecular decay~\cite{oulton_plasmon_2009,zhou_lasing_2013,akselrod_probing_2014}.
+
+\begin{figure} %[H]
+\includegraphics[width=0.7\columnwidth]{Array_Field_Average_Volume.pdf}
+\caption[Fig1]{How the average of the electric field strength squared depends on the volume over which the average is calculated? The light gray area in the inset demonstrates the area around each nano-particle
+that is to included in the average. Result is compared to the one where averaging area was not restricted
+other than by excluding points inside the nano-particles. That average
+is denoted by $\langle |{\bf E}|^2\rangle$ on the y-axis.
+We assumed similar parameters for the nano-particles as in the experiments~\cite{zhou_lasing_2013},
+but approximated the gold particles as ellipsoids instead of cylinders. 
+The main axis of the ellipsoids were $a=b=130\, nm$ and $c=37.5\, nm$ so that the volume of the particle is the same as the volume of the cylinders in Ref.~\cite{zhou_lasing_2013}. The lattice constant of the square array was $d=600\, nm$.
+}
+\label{fig:DDaveraging}
+\end{figure} 
+
+
+In order to get a closed set of equations 
+we still need equations for the level densities
+of all $4$-levels. Since it is not clear what fraction
+of the dye molecules are actually available to participate
+in the lasing at $\Gamma$-point we adjust the molecule
+concentration $N=N_1+N_2+N_3+N_4$ from the physical concentration $C$
+such that $N=fC$, where $f$ is the fraction of active molecules
+and should be somewhere between $0$ and $1$.
+%(${\bf e}_{in}$ is the unit vector in the direction of
+%the polarization in the gain media..presumably can be taken as along $x$ for %the stimulated
+%processes at least.)
+\beq
+\frac{dN_{1}(t)}{dt}=\frac{N_4}{\tau_{14}}+\frac{N_2}{\tau_{12}}+\frac{N_3}{\tau_{13}}-\frac{1}{\hbar\omega}
+Re\left[\frac{dP_{14}(t)}{dt} E_{in}(t)\right]
+\enq
+\beq
+\frac{dN_{4}(t)}{dt}=-\frac{N_4}{\tau_{14}}-\frac{N_4}{\tau_{43}}+\frac{1}{\hbar\omega}
+Re\left[\frac{dP_{14}(t)}{dt} E_{in}(t)\right]
+\enq
+\beq
+\frac{dN_{3}(t)}{dt}=\frac{N_4}{\tau_{43}}-\frac{N_3}{\tau_{23}}-\frac{N_3}{\tau_{13}}+\frac{1}{\hbar\omega_a}
+Re\left[\frac{dP_{23}(t)}{dt} E_{DD}(t)\right]
+\enq
+\beq
+\frac{dN_{2}(t)}{dt}=\frac{N_3}{\tau_{23}}-\frac{N_2}{\tau_{12}}-\frac{1}{\hbar\omega_a}
+Re\left[\frac{dP_{23}(t)}{dt}E_{DD}(t)\right].
+\enq
+There is no need for terms accounting for stimulated emission
+in $4-3$ and $1-2$ transitions since they are assumed to decay so quickly
+that spontaneous emission remains dominant.
+
+Close to metallic nano-particles Purcell effect can be 
+substantial which means that molecular decay rates close to nano-particles
+can be very different from those further away. We adjust the life time
+of the $2-3$ lasing transition with a Purcell factor $F$ so that
+$T_{23}\rightarrow T_{23}/F$ and $\gamma_{rad,23}\rightarrow \gamma_{rad,23}F$. Typically we have chosen the experimentally measured Purcell factor of $F=200$~\cite{zhou_lasing_2013}, but this is expected
+to vary between systems and is often uncertain without separate
+measurement.
+
+For concreteness we use here similar parameters as have been used to
+describe the experiments by Zhou {\it et al.}~\cite{zhou_lasing_2013} where IR-140 dye molecule
+was used. In particular we choose $\tau_{34}=\tau_{12}=10\, fs$
+and $\tau_{23}=\tau_{14}=1\, ns$. Pump wavelength is $\lambda_{14}=800\, nm$,
+index of refraction in the active media $n=1.52$, and
+absorption cross sections for the pump and lasing transitions are
+estimated as $\sigma_{14}=3.6\cdot 10^{16}\, {\rm cm^2}$ and
+$\sigma_{23}=4.5\cdot 10^{16}\, {\rm cm^2}$~\cite{sperber_experimental_1988}. 
+The damping coefficients due to finite linewidths were chosen
+as $\Delta \omega_{14}=2.94\cdot 10^{14}\, 1/s$ 
+and $\Delta \omega_{23}=2.49\cdot 10^{14}\, 1/s$. Dye concentration
+was $C=2\cdot 10^{18}, 1/cm^3$ unless otherwise mentioned.
+
+Note that in the above equations we also added an extra decay channel from the upper lasing level directly to the ground state to account for
+non-radiative transitions that reduce the quantum yield $\eta$. We have in particular
+$\tau_{nr}=\tau_{32} \eta/(1-\eta)$. We took the quantum yield for the IR-140 molecules to be $16\%$ as was estimated in the experiments by Zhou {\it et al.}~\cite{zhou_lasing_2013}. 
+
+
+
+
+\section{Results}
+
+\begin{itemize}
+\item Output power and FWHM as a function of input pulse properties
+\item FWHM should be reduced as concentration grows according to Odom people.: Close to threshold FWHM is smaller with larger concentration
+high above threshold FWHM is limited by the stimulated emission rate
+which is higher for larger concentrations. Then FWHM is larger for larger'
+concentrations.
+\item Does the result depend a lot on the quantum yield term?  No...it doesn't. 
+\item How does the threshold/output change with nano-particle volume?
+\end{itemize}
+
+In our model most parameters are either from the literature or
+experiments. The most uncertain parameters would typically be the fraction
+of the active molecules and the Purcell factor for different transitions.
+The parameters we use here are similar to the experiment by~\cite{zhou_lasing_2013} which found a lasing threshold
+at $0.23\, mJ/cm^2$. We demonstrate how our prediction
+for the lasing threshold depends on the fraction
+of active molecules in Fig.~\ref{fig:threshold}. Our results
+match experimental results well if $f\approx 0.12$.
+If all molecules are
+available then the threshold is lower.
+
+\begin{figure} %[H]
+\includegraphics[width=0.45\columnwidth]{Threshold_fraction.eps}
+\caption[Fig4]{Threshold as a fraction of active molecules when the 
+Purcell factor was taken as $F=200$. Parameters
+were similar as in the experiment by Zhou {\it et al.}~\cite{zhou_lasing_2013}. With $f\approx 0.12$ the result matches the experimental results.}
+\label{fig:threshold}
+\end{figure} 
+
+Having found all the necessary parameters, 
+in Fig.\ref{fig:demosimu} we demonstrate the behavior
+of lasing pulse energy as a function of pump pulse energy.
+Radiated energy is proportional to $\int |p(t)|^2dt$ and we scale
+this signal so that its maximum value is $1$ in the figure. As is clear there is a clear threshold after which the lasing pulse energy grows in a non-linear fashion.
+This is consistent with the FDTD calculation in by Dridi and Schatz~\cite{dridi_model_2013}.
+ 
+The Fig.\ref{fig:demosimu} also shows the FWHM of the
+Fourier-transform of dipole signal $p(t)$. For a weak pump this approaches the loss rate of the SLR $\gamma_{SLR}$. However, since in this regime the energy in the lasing mode is very small
+this might be hard to observe. 
+As the pump becomes larger FWHM is reduced by about factor of $3$
+so that just above threshold the FWHM is about $2.2\, nm$ with a $40\, fs$ pump pulse
+and about $1.8\, nm$ with a $160\, fs$ pulse. These results are close to experimentally observed 
+values. The minimum FWHM is reduced if the pump pulse is longer demonstrating that it is a 
+quantity that does depend on the details of the pump pulse even if, for example, 
+the  lasing threshold can be quite insensitive to the length of the pump pulse. In this parameter regime the
+energy in the lasing pulse increases  with pump pulse length and was 
+around $20$ times larger in the simulation with a longer pump pulse.
+As the pump increases further, FWHM starts to increase. This increase is related to
+shortening of the lasing pulse in time or, alternatively, to increasing maximum stimulated emission
+rate into the lasing mode. 
+
+Since Purcell factor and fraction of active molecules can be quite uncertain parameters it is useful to observe
+that threshold remains essentially the same if the product $F\times f$ remains the same.
+If, for example, we choose $F=24$ and $f=1$, the threshold is essentially
+the same as in
+Fig.\ref{fig:demosimu}. However, then the energy of the lasing pulse can be higher since
+active media has more energy available for lasing.
+
+
+
+\begin{figure} %[H]
+\includegraphics[width=0.45\columnwidth]{Odom_demo_a.eps}
+\includegraphics[width=0.45\columnwidth]{Odom_demo_b.eps}
+\caption[Fig5]{Energy in the lasing mode and the FWHM of the lasing signal.
+We choose the Purcell factor for the lasing transition to be $F=200$, the fraction of dye molecules
+participating in the lasing process as $f=0.05$, and $\gamma_{np}=10\, meV$.
+The concentration of dye molecules was set at $c=2\cdot 10^{18}\, 1/cm^3$.
+In (b) we show results with two different pump pulse lengths -- $40\, fs$ with a solid blue line
+and $160\, fs$ with a dashed red line.}
+\label{fig:demosimu}
+\end{figure} 
+
+
+Generally, the threshold is moved higher if the plasmon losses increase or 
+if the molecule concentration is reduced. The effect of non-unit
+quantum yield was small in the parameter regime we explored.
+In the vicinity of the threshold FWHM of the lasing pulse is also lower for higher molecule concentrations.
+Well above threshold this is reversed and higher concentrations imply 
+have somewhat higher FWHM because the system has then higher stimulated
+emission rate which shortens the lasing pulse. We demonstrate this in 
+Fig.~\ref{fig:demosimu_2concentrations} by simulations with two different molecule concentrations.
+\begin{figure} %[H]
+%\includegraphics[width=0.45\columnwidth]{Odom_concentration_a.eps}
+\includegraphics[width=0.45\columnwidth]{Odom_concentration_b.eps}
+\caption[Fig6]{The FWHM of the lasing signal for two different molecule
+concentrations.
+We set the fraction of dye molecules
+participating in the lasing process as $f=0.09$ and the
+concentration of dye molecules was either $C=2\cdot 10^{18}\, 1/cm^3$ (solid line)
+or $C=4\cdot 10^{18}\, 1/cm^3$ (dashed line).
+}
+\label{fig:demosimu_2concentrations}
+\end{figure} 
+
+
+
+%\section{Discussion}
+
+
+
+\section{Conclusions}
+We have developed a computationally light method to study lasing in plasmonic nano-particle arrays. By benchmarking the model against
+experimental results,
+we demonstrated that despite simplifying assumptions the model reproduces many experimental
+observations well. 
+Considering the approximations we made and uncertainties in the parameters we consider
+our model surprisingly accurate. It reproduces most features of the full FDTD calculations, but
+with far less computational effort. This can prove to be useful if large parameter
+regimes must be scanned or in gaining a quick overview of the expected properties of some specific plasmonic structure.
+Here we applied the model only to a fairly simple system of square array, but our approach generalizes also to other situations for which CDA
+is accurate.
+
+
+
+%\begin{acknowledgments}
+\ack{
+This work was supported by the Academy of Finland through its
+Centres of Excellence Programme (Projects No. 251748, No. 263347 and No. 13272490) and by the
+European Research Council (ERC-2013-AdG-340748- CODE)}
+%\end{acknowledgments}
+
+\vspace{1cm}
+
+%\bibliographystyle{apsrev}
+\bibliographystyle{iopart-num}
+\bibliography{./bibli_Plasmon_lasing}
+
+\end{document}
